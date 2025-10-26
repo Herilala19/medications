@@ -26,6 +26,7 @@ import { Drug } from './models/drug.model';
 import { DrugSchedule } from './models/drug-schedule.model';
 import { User } from '../users/models/user.model';
 import { PaginationArgs } from '../common/pagination/pagination.args';
+import { User as UserPrisma } from '@prisma/client';
 
 @Resolver(() => Drug)
 @UseGuards(GqlAuthGuard, RolesGuard)
@@ -37,7 +38,7 @@ export class DrugsResolver {
 
   @Query(() => DrugConnection)
   async drugs(
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
     @Args() pagination: PaginationArgs,
     @Args('orderBy', { nullable: true }) orderBy?: DrugOrderInput,
     @Args('isActive', { nullable: true }) isActive?: boolean,
@@ -46,10 +47,7 @@ export class DrugsResolver {
   }
 
   @Query(() => Drug, { nullable: true })
-  async drug(
-    @Args('id') id: string,
-    @UserEntity() user: any,
-  ): Promise<Drug | null> {
+  async drug(@Args('id') id: string): Promise<Drug | null> {
     try {
       return (await this.drugsService.findDrugById(id)) as unknown as Drug;
     } catch (error) {
@@ -61,13 +59,13 @@ export class DrugsResolver {
   async drugSchedules(
     @Args('drugId') drugId: string,
     @Args() pagination: PaginationArgs,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<DrugScheduleConnection> {
     return this.drugsService.findDrugSchedules(user.id, drugId, pagination);
   }
 
   @Query(() => [Drug])
-  async upcomingDrugs(@UserEntity() user: any): Promise<Drug[]> {
+  async upcomingDrugs(@UserEntity() user: UserPrisma): Promise<Drug[]> {
     return (await this.drugsService.getUpcomingDrugs(
       user.id,
     )) as unknown as Drug[];
@@ -77,7 +75,7 @@ export class DrugsResolver {
   @Roles(Role.USER, Role.ADMIN)
   async createDrug(
     @Args('input') input: CreateDrugInput,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<Drug> {
     return (await this.drugsService.createDrug(
       user.id,
@@ -90,7 +88,7 @@ export class DrugsResolver {
   async updateDrug(
     @Args('id') id: string,
     @Args('input') input: UpdateDrugInput,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<Drug> {
     return (await this.drugsService.updateDrug(
       user.id,
@@ -103,7 +101,7 @@ export class DrugsResolver {
   @Roles(Role.USER, Role.ADMIN)
   async deleteDrug(
     @Args('id') id: string,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<boolean> {
     return this.drugsService.deleteDrug(user.id, id);
   }
@@ -112,7 +110,7 @@ export class DrugsResolver {
   @Roles(Role.USER, Role.ADMIN)
   async createDrugSchedule(
     @Args('input') input: CreateDrugScheduleInput,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<DrugSchedule> {
     return (await this.drugsService.createDrugSchedule(
       user.id,
@@ -125,7 +123,7 @@ export class DrugsResolver {
   async updateDrugSchedule(
     @Args('id') id: string,
     @Args('input') input: UpdateDrugScheduleInput,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<DrugSchedule> {
     return (await this.drugsService.updateDrugSchedule(
       user.id,
@@ -138,7 +136,7 @@ export class DrugsResolver {
   @Roles(Role.USER, Role.ADMIN)
   async deleteDrugSchedule(
     @Args('id') id: string,
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
   ): Promise<boolean> {
     return this.drugsService.deleteDrugSchedule(user.id, id);
   }
@@ -146,7 +144,7 @@ export class DrugsResolver {
   @Mutation(() => DrugSchedule)
   @Roles(Role.USER, Role.ADMIN)
   async markDrugTaken(
-    @UserEntity() user: any,
+    @UserEntity() user: UserPrisma,
     @Args('scheduleId') scheduleId: string,
     @Args('takenAt', { nullable: true }) takenAt?: Date,
   ): Promise<DrugSchedule> {

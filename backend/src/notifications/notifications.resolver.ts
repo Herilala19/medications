@@ -14,6 +14,7 @@ import { CreateNotificationInput } from './dto/create-notification.input';
 import { Notification } from './models/notification.model';
 import { NotificationConnection } from './models/notification-connection.model';
 import { PaginationArgs } from '../common/pagination/pagination.args';
+import { User } from '@prisma/client';
 
 @Resolver(() => Notification)
 @UseGuards(GqlAuthGuard)
@@ -22,7 +23,7 @@ export class NotificationsResolver {
 
   @Query(() => NotificationConnection)
   async notifications(
-    @UserEntity() user: any,
+    @UserEntity() user: User,
     @Args() pagination: PaginationArgs,
     @Args('unreadOnly', { nullable: true }) unreadOnly?: boolean,
   ): Promise<NotificationConnection> {
@@ -40,7 +41,7 @@ export class NotificationsResolver {
 
   @Mutation(() => Notification)
   async createNotification(
-    @UserEntity() user: any,
+    @UserEntity() user: User,
     @Args('input') input: CreateNotificationInput,
   ): Promise<Notification> {
     return (await this.notificationsService.createNotification(
@@ -51,7 +52,7 @@ export class NotificationsResolver {
 
   @Mutation(() => Notification)
   async markNotificationAsRead(
-    @UserEntity() user: any,
+    @UserEntity() user: User,
     @Args('id') id: string,
   ): Promise<Notification> {
     return (await this.notificationsService.markAsRead(user.id, id)) as any;
