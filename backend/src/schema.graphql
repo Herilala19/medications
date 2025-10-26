@@ -1,0 +1,294 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Auth {
+  """JWT access token"""
+  accessToken: JWT!
+
+  """JWT refresh token"""
+  refreshToken: JWT!
+  user: User!
+}
+
+input ChangePasswordInput {
+  newPassword: String!
+  oldPassword: String!
+}
+
+input CreateDrugInput {
+  description: String
+  dosage: String!
+  endDate: String
+  frequency: Int!
+  frequencyUnit: FrequencyUnit!
+  name: String!
+  startDate: String!
+  unit: String!
+}
+
+input CreateDrugScheduleInput {
+  dosage: String!
+  drugId: String!
+  notes: String
+  time: String!
+}
+
+input CreateNotificationInput {
+  drugScheduleId: String
+  message: String!
+  scheduledFor: String!
+  title: String!
+  type: NotificationType!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Drug {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  description: String
+  dosage: String!
+  endDate: DateTime
+  frequency: Int!
+  frequencyUnit: FrequencyUnit!
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  schedules: [DrugSchedule!]!
+  startDate: DateTime!
+  unit: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  user: User!
+  userId: String!
+}
+
+type DrugConnection {
+  edges: [DrugEdge!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type DrugEdge {
+  cursor: String!
+  node: Drug!
+}
+
+"""Fields available for drug ordering"""
+enum DrugOrderField {
+  CREATED_AT
+  NAME
+  START_DATE
+  UPDATED_AT
+}
+
+input DrugOrderInput {
+  direction: OrderDirection!
+  field: DrugOrderField!
+}
+
+type DrugSchedule {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  dosage: String!
+  drug: Drug!
+  drugId: String!
+  id: ID!
+  notes: String
+  taken: Boolean!
+  takenAt: DateTime
+  time: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
+type DrugScheduleConnection {
+  edges: [DrugScheduleEdge!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type DrugScheduleEdge {
+  cursor: String!
+  node: DrugSchedule!
+}
+
+"""Frequency unit for drug administration"""
+enum FrequencyUnit {
+  DAYS
+  HOURS
+  WEEKS
+}
+
+"""
+A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
+"""
+scalar JWT
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  changePassword(data: ChangePasswordInput!): User!
+  createDrug(input: CreateDrugInput!): Drug!
+  createDrugSchedule(input: CreateDrugScheduleInput!): DrugSchedule!
+  createNotification(input: CreateNotificationInput!): Notification!
+  deleteDrug(id: String!): Boolean!
+  deleteDrugSchedule(id: String!): Boolean!
+  login(data: LoginInput!): Auth!
+  markAllNotificationsAsRead: Int!
+  markDrugTaken(scheduleId: String!, takenAt: DateTime): DrugSchedule!
+  markNotificationAsRead(id: String!): Notification!
+  refreshToken(token: JWT!): Token!
+  signup(data: SignupInput!): Auth!
+  updateDrug(id: String!, input: UpdateDrugInput!): Drug!
+  updateDrugSchedule(id: String!, input: UpdateDrugScheduleInput!): DrugSchedule!
+  updateUser(data: UpdateUserInput!): User!
+}
+
+type Notification {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  drugSchedule: DrugSchedule
+  drugScheduleId: String
+  id: ID!
+  message: String!
+  read: Boolean!
+  readAt: DateTime
+  scheduledFor: DateTime!
+  sentAt: DateTime
+  status: NotificationStatus!
+  title: String!
+  type: NotificationType!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  userId: String!
+}
+
+type NotificationConnection {
+  edges: [NotificationEdge!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type NotificationEdge {
+  cursor: String!
+  node: Notification!
+}
+
+"""Status of notification"""
+enum NotificationStatus {
+  CANCELLED
+  FAILED
+  PENDING
+  SENT
+}
+
+"""Type of notification"""
+enum NotificationType {
+  DRUG_MISSED
+  DRUG_REMINDER
+  DRUG_UPCOMING
+  SYSTEM
+}
+
+"""
+Possible directions in which to order a list of items when provided an `orderBy` argument.
+"""
+enum OrderDirection {
+  asc
+  desc
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Query {
+  drug(id: String!): Drug
+  drugSchedules(after: String, before: String, drugId: String!, first: Int, last: Int, skip: Int): DrugScheduleConnection!
+  drugs(after: String, before: String, first: Int, isActive: Boolean, last: Int, orderBy: DrugOrderInput, skip: Int): DrugConnection!
+  hello(name: String!): String!
+  helloWorld: String!
+  me: User!
+  notifications(after: String, before: String, first: Int, last: Int, skip: Int, unreadOnly: Boolean): NotificationConnection!
+  unreadNotificationCount: Int!
+  upcomingDrugs: [Drug!]!
+}
+
+"""User role"""
+enum Role {
+  ADMIN
+  USER
+}
+
+input SignupInput {
+  email: String!
+  firstname: String
+  lastname: String
+  password: String!
+}
+
+type Subscription {
+  notificationCreated: Notification!
+}
+
+type Token {
+  """JWT access token"""
+  accessToken: JWT!
+
+  """JWT refresh token"""
+  refreshToken: JWT!
+}
+
+input UpdateDrugInput {
+  description: String
+  dosage: String
+  endDate: String
+  frequency: Int
+  frequencyUnit: FrequencyUnit
+  isActive: Boolean
+  name: String
+  startDate: String
+  unit: String
+}
+
+input UpdateDrugScheduleInput {
+  dosage: String
+  notes: String
+  taken: Boolean
+  takenAt: String
+  time: String
+}
+
+input UpdateUserInput {
+  firstname: String
+  lastname: String
+}
+
+type User {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  drugs: [Drug!]
+  email: String!
+  firstname: String
+  id: ID!
+  lastname: String
+  notifications: [Notification!]
+  role: Role!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}

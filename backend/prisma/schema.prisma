@@ -1,0 +1,107 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x"]
+}
+
+model User {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  email         String         @unique
+  password      String
+  firstname     String?
+  lastname      String?
+  drugs         Drug[]
+  notifications Notification[]
+  role          Role
+
+  @@map("users")
+}
+
+model Drug {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          String
+  description   String?
+  dosage        String
+  unit          String
+  frequency     Int
+  frequencyUnit FrequencyUnit
+  startDate     DateTime
+  endDate       DateTime?
+  isActive      Boolean        @default(true)
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedules     DrugSchedule[]
+
+  @@map("drugs")
+}
+
+model DrugSchedule {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  drugId        String
+  drug          Drug           @relation(fields: [drugId], references: [id], onDelete: Cascade)
+  time          String
+  dosage        String
+  taken         Boolean        @default(false)
+  takenAt       DateTime?
+  notes         String?
+  notifications Notification[]
+
+  @@map("drug_schedules")
+}
+
+model Notification {
+  id             String             @id @default(cuid())
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  userId         String
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drugScheduleId String?
+  drugSchedule   DrugSchedule?      @relation(fields: [drugScheduleId], references: [id], onDelete: Cascade)
+  type           NotificationType
+  title          String
+  message        String
+  scheduledFor   DateTime
+  sentAt         DateTime?
+  read           Boolean            @default(false)
+  readAt         DateTime?
+  status         NotificationStatus @default(PENDING)
+
+  @@index([userId, status])
+  @@index([scheduledFor, status])
+  @@map("notifications")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum FrequencyUnit {
+  HOURS
+  DAYS
+  WEEKS
+}
+
+enum NotificationType {
+  DRUG_REMINDER
+  DRUG_MISSED
+  DRUG_UPCOMING
+  SYSTEM
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
