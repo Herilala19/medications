@@ -16,12 +16,13 @@ import { LANGUAGES } from "@/utils/constants";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { type FC, useTransition } from "react";
+import { type FC, useTransition, useState, useEffect } from "react";
 import classNames from "classnames";
 
 export const Header: FC = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const params = useParams();
   const locale = useLocale();
@@ -29,6 +30,10 @@ export const Header: FC = () => {
   const { user, isAuthenticated, signOut } = useAuth();
   const t = useTranslations("Drugs");
   const tAuth = useTranslations("Auth");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const clickChangeTheme = () => {
     changeTheme(theme === "dark" ? "" : "dark");
   };
@@ -64,7 +69,10 @@ export const Header: FC = () => {
           </Typography.Text>
         </div>
         <div className="flex gap-4">
-          {!isAuthenticated() ? (
+          {!isMounted ? (
+            // Render a placeholder during SSR to prevent hydration mismatch
+            <div className="h-10 w-32 animate-pulse bg-background-component rounded-lg" />
+          ) : !isAuthenticated() ? (
             <>
               <Link
                 href="/signin"

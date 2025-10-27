@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCreateDrug } from "@/hooks/useDrugs";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function CreateDrugPage() {
@@ -13,14 +13,28 @@ export default function CreateDrugPage() {
   const { isAuthenticated } = useAuth();
   const { createDrug, loading, error } = useCreateDrug();
   const t = useTranslations("Drugs");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     document.title = `${t("addNewMedication")} | Medication Reminder`;
   }, [t]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleCancel = () => {
     router.push("/drugs");
   };
+
+  if (!isMounted) {
+    return (
+      <div className="mx-auto w-full max-w-4xl p-4 md:p-8 space-y-6">
+        <div className="h-8 w-48 animate-pulse bg-background-component rounded" />
+        <div className="h-64 animate-pulse bg-background-component rounded" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated()) {
     return (

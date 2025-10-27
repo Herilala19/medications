@@ -21,12 +21,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDrugsList } from "@/hooks/useDrugs";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function DrugsPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const t = useTranslations("Drugs");
+  const [isMounted, setIsMounted] = useState(false);
 
   const {
     drugs,
@@ -55,10 +56,14 @@ export default function DrugsPage() {
   }, [t]);
 
   useEffect(() => {
-    if (isAuthenticated() && refetch) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted && isAuthenticated() && refetch) {
       refetch();
     }
-  }, [isAuthenticated, refetch]);
+  }, [isMounted, isAuthenticated, refetch]);
 
   const handleEdit = (id: string) => {
     router.push(`/drugs/edit/${id}`);
@@ -67,6 +72,15 @@ export default function DrugsPage() {
   const handleCreate = () => {
     router.push("/drugs/create");
   };
+
+  if (!isMounted) {
+    return (
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center gap-6 p-8 min-h-[60vh]">
+        <div className="h-8 w-48 animate-pulse bg-background-component rounded" />
+        <div className="h-4 w-64 animate-pulse bg-background-component rounded" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated()) {
     return (

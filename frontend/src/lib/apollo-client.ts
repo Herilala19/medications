@@ -90,8 +90,6 @@ const errorLink = onError(
                     },
                   });
 
-                  console.log(operation)
-
                   // Retry the original operation with new token
                   return forward(operation);
                 } else {
