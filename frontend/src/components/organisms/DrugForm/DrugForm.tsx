@@ -22,9 +22,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 
 const FREQUENCY_UNITS = [
+  { value: "HOURS", label: "Hourly" },
   { value: "DAYS", label: "Daily" },
   { value: "WEEKS", label: "Weekly" },
-  { value: "MONTHS", label: "Monthly" },
 ];
 
 interface DrugFormProps {

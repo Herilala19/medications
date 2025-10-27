@@ -188,7 +188,19 @@ export function useCreateDrug() {
   const [error, setError] = useState<string | null>(null);
 
   const [createDrugMutation, { loading }] = useMutation(CREATE_DRUG_MUTATION, {
-    refetchQueries: [{ query: GET_DRUGS_QUERY, variables: { first: 10 } }],
+    refetchQueries: [
+      { 
+        query: GET_DRUGS_QUERY, 
+        variables: { 
+          first: 10,
+          orderBy: {
+            field: "CREATED_AT",
+            direction: "desc",
+          },
+        } 
+      }
+    ],
+    awaitRefetchQueries: true,
   });
 
   const createDrug = async (data: CreateDrugFormData | any) => {
@@ -222,7 +234,19 @@ export function useUpdateDrug(drugId: string) {
   const [error, setError] = useState<string | null>(null);
 
   const [updateDrugMutation, { loading }] = useMutation(UPDATE_DRUG_MUTATION, {
-    refetchQueries: [{ query: GET_DRUGS_QUERY, variables: { first: 10 } }],
+    refetchQueries: [
+      { 
+        query: GET_DRUGS_QUERY, 
+        variables: { 
+          first: 10,
+          orderBy: {
+            field: "CREATED_AT",
+            direction: "desc",
+          },
+        } 
+      }
+    ],
+    awaitRefetchQueries: true,
   });
 
   const updateDrug = async (formData: UpdateDrugFormData | any) => {

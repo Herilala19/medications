@@ -28,10 +28,6 @@ export default function DrugsPage() {
   const { isAuthenticated } = useAuth();
   const t = useTranslations("Drugs");
 
-  useEffect(() => {
-    document.title = `${t("title")} | Medication Reminder`;
-  }, [t]);
-
   const {
     drugs,
     loading,
@@ -48,10 +44,21 @@ export default function DrugsPage() {
     openDeleteDialog,
     closeDeleteDialog,
     confirmDelete,
+    refetch,
   } = useDrugsList({
     pageSize: 10,
     skip: !isAuthenticated(),
   });
+
+  useEffect(() => {
+    document.title = `${t("title")} | Medication Reminder`;
+  }, [t]);
+
+  useEffect(() => {
+    if (isAuthenticated() && refetch) {
+      refetch();
+    }
+  }, [isAuthenticated, refetch]);
 
   const handleEdit = (id: string) => {
     router.push(`/drugs/edit/${id}`);

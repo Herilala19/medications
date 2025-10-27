@@ -9,12 +9,23 @@ import type {
   NestConfig,
   SwaggerConfig,
 } from './common/configs/config.interface';
+import { CustomLoggerService } from './common/logger';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  const logger = app.get(CustomLoggerService);
+  app.useLogger(logger);
+  logger.setContext('Bootstrap');
 
   // Validation
   app.useGlobalPipes(new ValidationPipe());
+
+  // Global logging interceptor
+  app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
   // enable shutdown hook
   app.enableShutdownHooks();
@@ -45,6 +56,20 @@ async function bootstrap() {
     app.enableCors();
   }
 
-  await app.listen(process.env.PORT || nestConfig.port || 3000);
+  const port = process.env.PORT || nestConfig.port || 3000;
+  await app.listen(port);
+
+  logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  logger.log(`📊 GraphQL Playground: http://localhost:${port}/graphql`);
+
+  if (swaggerConfig.enabled) {
+    logger.log(
+      `📝 Swagger API: http://localhost:${port}/${swaggerConfig.path || 'api'}`,
+    );
+  }
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('❌ Error starting application:', err);
+  process.exit(1);
+});

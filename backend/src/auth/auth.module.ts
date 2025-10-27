@@ -36,6 +36,6 @@ import { SecurityConfig } from '../common/configs/config.interface';
     PasswordService,
     LoginAttemptsService,
   ],
-  exports: [GqlAuthGuard],
+  exports: [GqlAuthGuard, JwtModule],
 })
 export class AuthModule {}

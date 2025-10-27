@@ -70,7 +70,7 @@ export const createDrugSchema = z.object({
     .number()
     .min(1, "Frequency must be at least 1")
     .max(100, "Frequency must not exceed 100"),
-  frequencyUnit: z.enum(["DAYS", "WEEKS", "MONTHS"], {
+  frequencyUnit: z.enum(["HOURS", "DAYS", "WEEKS"], {
     error: "Frequency unit is required",
   }),
   startDate: z

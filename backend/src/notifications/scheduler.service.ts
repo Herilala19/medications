@@ -27,10 +27,4 @@ export class SchedulerService {
       this.logger.error('Error processing pending notifications:', error);
     }
   }
-
-  @Cron('0 0 * * *')
-  async cleanupOldNotifications() {
-    this.logger.log('Running scheduled job: Cleanup old notifications');
-    // TODO: Implement cleanup logic for old notifications
-  }
 }
